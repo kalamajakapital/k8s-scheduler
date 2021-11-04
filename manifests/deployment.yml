@@ -6,7 +6,7 @@ metadata:
   namespace: kube-system
   labels:
     app.kubernetes.io/name: kalamajakapital-scheduler
-    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/version: "0.1.0-alpha2"
     app.kubernetes.io/component: scheduler
     app.kubernetes.io/part-of: core-infra
     kalamajakapital.ee/tier: "0"
