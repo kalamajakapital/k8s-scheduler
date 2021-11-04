@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kalamajakapital-scheduler
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: kalamajakapital-scheduler
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/component: scheduler
+    app.kubernetes.io/part-of: core-infra
+    kalamajakapital.ee/tier: "0"
+    kalamajakapital.ee/team: platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kalamajakapital-scheduler
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kalamajakapital-scheduler
+    spec:
+      serviceAccountName: kalamajakapital-scheduler
+      # TODO: cluster would need to support gvisor runtime class
+      # runtimeClassName: gvisor
+      containers:
+        - name: kalamajakapital-scheduler
+          image: kalamajakapital/workload-scheduler:0.1.0-alpha2
+          env:
+          - name: SCHEDULER_CONFIG
+            value: "/tmp/scheduler.config.yaml"
+          - name: SCHEDULER_LOGGING_CONFIG
+            value: "/tmp/scheduler.logging.yaml"
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+          volumeMounts:
+          - name: kalamajakapital-scheduler-config
+            mountPath: /tmp/
+            readOnly: true
+          # Metrics port goes here
+          # API for liveness and readiness checks goes here
+      volumes:
+      - name: kalamajakapital-scheduler-config
+        configMap:
+          name: kalamajakapital-scheduler-configmap
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 55634

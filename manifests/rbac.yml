@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kalamajakapital-scheduler
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: kalamajakapital-scheduler
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kalamajakapital-scheduler
+  labels:
+    app.kubernetes.io/name: kalamajakapital-scheduler
+rules:
+# Bit too many permissions here.
+# Would need to check what's the bare minimum required.
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["watch", "get", "list"]
+- apiGroups: [""]
+  resources: ["pods", "namespaces"]
+  verbs: ["watch", "get", "list"]
+- apiGroups: [""]
+  resources: ["*"]
+  verbs: ["watch", "get", "list"]
+- apiGroups: [""]
+  resources: ["pods/binding"]
+  verbs: ["create", "update", "patch", "delete", "get", "list", "watch"]
+- apiGroups: ["customresourcedefinitions.v1.apiextensions.k8s.io"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kalamajakapital-scheduler-read
+  labels:
+    app.kubernetes.io/name: kalamajakapital-scheduler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kalamajakapital-scheduler
+subjects:
+  - kind: ServiceAccount
+    name: kalamajakapital-scheduler
+    namespace: kube-system
